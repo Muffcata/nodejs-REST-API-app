@@ -11,6 +11,14 @@ const validateContact = (contact) => {
   return schema.validate(contact);
 };
 
+const checkContactId = (contact, contactId, res) => {
+  if (!contact) {
+    return res
+      .status(404)
+      .json({ message: `Contact with id=${contactId} was not found.` });
+  }
+};
+
 const getContact = async (req, res, next) => {
   try {
     const contacts = await service.listContacts();
@@ -22,7 +30,9 @@ const getContact = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
+    const { contactId } = req.params;
     const contact = await service.getContactById(req.params.contactId);
+    checkContactId(contact, contactId, res);
     res.json(contact);
   } catch (error) {
     next(error);
@@ -41,7 +51,9 @@ const create = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
   try {
+    const { contactId } = req.params;
     const contact = await service.removeContact(req.params.contactId);
+    checkContactId(contact, contactId, res);
     res.status(200).json({ message: "contact deleted" });
     if (!contact) {
       return res.status(404).json({ message: "Contact not found" });
