@@ -60,6 +60,7 @@ const remove = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+
     return res.status(500).json({ message: "Server error" });
   }
 };
