@@ -85,18 +85,36 @@ const login = async (req, res, next) => {
   });
 };
 
-// const getUser = (req, res, next) => {
-//   const { username } = req.user;
-//   res.json({
-//     status: "success",
-//     code: 200,
-//     data: {
-//       message: `Authorization was successful: ${username}`,
-//     },
-//   });
-// };
+const logout = async (req, res, next) => {
+  try {
+    req.user.token = null;
+    await req.user.save();
+    res.status(204).json();
+  } catch (error) {
+    next(error);
+  }
+};
+
+const currentUser = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const { email, subscription } = user;
+    res.json({
+      status: "OK",
+      code: 200,
+      ResponseBody: {
+        email: email,
+        subscription: subscription,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   login,
   register,
+  logout,
+  currentUser,
 };

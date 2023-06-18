@@ -4,9 +4,13 @@ const ctrlContacts = require("../../controllers/contactControllers");
 const ctrlUser = require("../../controllers/userController");
 const auth = require("../../auth/auth");
 
-router.post("/users/register", auth, ctrlUser.register);
+router.post("/users/register", ctrlUser.register);
 
-router.post("/users/signin", auth, ctrlUser.login);
+router.post("/users/signin", ctrlUser.login);
+
+router.get("/users/current", auth, ctrlUser.currentUser);
+
+router.get("/users/logout", auth, ctrlUser.logout);
 
 router.get("/contacts", ctrlContacts.getContact);
 
