@@ -1,7 +1,14 @@
 const Contact = require("./models/contactsModel");
 
-const listContacts = async () => {
-  return Contact.find();
+const listContacts = async (options) => {
+  const { favorite } = options;
+  if (favorite) {
+    const contacts = await Contact.paginate({ favorite }, options);
+    return contacts;
+  } else {
+    const contacts = await Contact.paginate({}, options);
+    return contacts;
+  }
 };
 
 const getContactById = (id) => {

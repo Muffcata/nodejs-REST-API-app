@@ -20,8 +20,15 @@ const checkContactId = (contact, contactId, res) => {
 };
 
 const getContact = async (req, res, next) => {
+  const { page, limit, favorite } = req.query;
+  const options = {
+    page: page || 1,
+    limit: limit || 20,
+    favorite: favorite || null,
+  };
+
   try {
-    const contacts = await service.listContacts();
+    const contacts = await service.listContacts(options);
     res.json(contacts);
   } catch (error) {
     next(error);
