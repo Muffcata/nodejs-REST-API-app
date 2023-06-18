@@ -1,6 +1,7 @@
 const Joi = require("joi").extend(require("joi-phone-number"));
 const User = require("../service/models/users");
 const jwt = require("jsonwebtoken");
+const service = require("../service/index");
 
 require("dotenv").config();
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
@@ -15,6 +16,12 @@ const userCreateValidationShema = Joi.object({
 });
 
 const validateCreateUser = validator(userCreateValidationShema);
+
+const subscriptionUpdate = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business").required(),
+});
+
+const validateSubscription = validator(subscriptionUpdate);
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
@@ -112,9 +119,52 @@ const currentUser = async (req, res, next) => {
   }
 };
 
+const subscription = async (req, res, next) => {
+  const { subscription, email } = req.body;
+
+  const { error } = validateSubscription({ subscription, email });
+  if (error) {
+    try {
+      const user = await service.updateSubscription(email, subscription);
+      if (user) {
+        res.status(200).json({
+          status: "success",
+          code: 200,
+          data: {
+            email,
+            subscription,
+          },
+        });
+      } else {
+        res.status(404).json({
+          status: "error",
+          code: 404,
+          message: `User not found`,
+          data: "Not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+};
+
+//       return res.status(400).json({ message: error.message });
+//     }
+//     const { email } = req.user;
+//     const user =;
+//     res.status(200).json(user);
+//   } catch (error) {
+//     next(error);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 module.exports = {
   login,
   register,
   logout,
   currentUser,
+  subscription,
 };

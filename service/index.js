@@ -1,4 +1,5 @@
 const Contact = require("./models/contactsModel");
+const User = require("./models/users");
 
 const listContacts = async (options) => {
   const { favorite } = options;
@@ -34,6 +35,10 @@ const updateStatusContact = (contactId, favorite) => {
     { new: true }
   );
 };
+
+const updateSubscription = (email, subscription) =>
+  User.findOneAndUpdate({ email }, { subscription }, { new: true });
+
 module.exports = {
   listContacts,
   getContactById,
@@ -41,4 +46,5 @@ module.exports = {
   addContact,
   updateContact,
   updateStatusContact,
+  updateSubscription,
 };
