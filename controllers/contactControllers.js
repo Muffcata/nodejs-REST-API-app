@@ -42,7 +42,7 @@ const getById = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     validateContact(res, res.body);
-    const newContact = service.addContact(req.body);
+    const newContact = service.addContact(req.body, { owner: req.user.id });
     res.status(201).json(newContact);
   } catch (error) {
     next(error);

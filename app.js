@@ -18,7 +18,8 @@ connection
     console.log(`Server not running. Error message: ${err.message}`)
   );
 
-const contactsRouter = require("./routes/api/contactsRoutes");
+const contactsAndUsersRouter = require("./routes/api/routes");
+
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
@@ -26,12 +27,14 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
-app.use("/api/contacts", contactsRouter);
+require("./auth/config-passport");
+app.use("/api", contactsAndUsersRouter);
+
 app.use((_, res, __) => {
   res.status(404).json({
     status: "error",
     code: 404,
-    message: "Use api on routes: /api/contacts",
+    message: "Use api on routes: /api/contacts or users",
     data: "Not found",
   });
 });
