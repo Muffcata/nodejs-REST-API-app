@@ -20,8 +20,15 @@ const checkContactId = (contact, contactId, res) => {
 };
 
 const getContact = async (req, res, next) => {
+  const { page, limit, favorite } = req.query;
+  const options = {
+    page: page || 1,
+    limit: limit || 20,
+    favorite: favorite || null,
+  };
+
   try {
-    const contacts = await service.listContacts();
+    const contacts = await service.listContacts(options);
     res.json(contacts);
   } catch (error) {
     next(error);
@@ -42,7 +49,7 @@ const getById = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     validateContact(res, res.body);
-    const newContact = service.addContact(req.body);
+    const newContact = service.addContact(req.body, { owner: req.user.id });
     res.status(201).json(newContact);
   } catch (error) {
     next(error);

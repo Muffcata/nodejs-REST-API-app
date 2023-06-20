@@ -1,7 +1,15 @@
 const Contact = require("./models/contactsModel");
+const User = require("./models/users");
 
-const listContacts = async () => {
-  return Contact.find();
+const listContacts = async (options) => {
+  const { favorite } = options;
+  if (favorite) {
+    const contacts = await Contact.paginate({ favorite }, options);
+    return contacts;
+  } else {
+    const contacts = await Contact.paginate({}, options);
+    return contacts;
+  }
 };
 
 const getContactById = (id) => {
@@ -27,6 +35,10 @@ const updateStatusContact = (contactId, favorite) => {
     { new: true }
   );
 };
+
+const updateSubscription = (email, subscription) =>
+  User.findOneAndUpdate({ email }, { subscription }, { new: true });
+
 module.exports = {
   listContacts,
   getContactById,
@@ -34,4 +46,5 @@ module.exports = {
   addContact,
   updateContact,
   updateStatusContact,
+  updateSubscription,
 };
