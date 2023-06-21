@@ -19,6 +19,7 @@ connection
   );
 
 const contactsAndUsersRouter = require("./routes/api/routes");
+// const avatarRouter = require("./routes/api/avatars");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(cors());
 app.use(express.json());
 require("./auth/config-passport");
 app.use("/api", contactsAndUsersRouter);
+// app.use("/api", avatarRouter);
 
 app.use((_, res, __) => {
   res.status(404).json({

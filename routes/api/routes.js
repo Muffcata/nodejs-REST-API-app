@@ -26,4 +26,40 @@ router.put("/contacts/:contactId", ctrlContacts.update);
 
 router.patch("/contacts/:contactId/favorite", ctrlContacts.updateStatus);
 
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs").promises;
+
+const storeAvatar = path.join(process.cwd(), "public/avatars");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, storeAvatar);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+  limits: { fileSize: 2000000 },
+});
+
+const upload = multer({ storage });
+
+router.post("/avatars", upload.single("avatar"), async (req, res, next) => {
+  const { path: tempName, originalname } = req.file;
+
+  const fileName = path.join(storeAvatar, originalname);
+
+  try {
+    await fs.rename(tempName, fileName);
+  } catch (error) {
+    await fs.unlink(tempName);
+    next(error);
+  }
+
+  res.json({
+    status: 200,
+    message: "File uploaded",
+  });
+});
+
 module.exports = router;
