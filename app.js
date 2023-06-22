@@ -27,7 +27,9 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 app.use(logger(formatsLogger));
 app.use(cors());
+app.use(express.static("public"));
 app.use(express.json());
+
 require("./auth/config-passport");
 app.use("/api", contactsAndUsersRouter);
 // app.use("/api", avatarRouter);

@@ -2,6 +2,7 @@ const Joi = require("joi").extend(require("joi-phone-number"));
 const User = require("../service/models/users");
 const jwt = require("jsonwebtoken");
 const service = require("../service/index");
+const gravatar = require("gravatar");
 
 require("dotenv").config();
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
@@ -25,7 +26,7 @@ const validateSubscription = validator(subscriptionUpdate);
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email, password);
+  const avatarURL = gravatar.url(email, { s: "200", d: "retro" });
 
   const user = await User.findOne({ email });
   if (user) {
@@ -41,7 +42,7 @@ const register = async (req, res, next) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
-    const newUser = new User({ email });
+    const newUser = new User({ email, avatarURL });
     newUser.setPassword(password);
     await newUser.save();
 
@@ -149,17 +150,6 @@ const subscription = async (req, res, next) => {
     }
   }
 };
-
-//       return res.status(400).json({ message: error.message });
-//     }
-//     const { email } = req.user;
-//     const user =;
-//     res.status(200).json(user);
-//   } catch (error) {
-//     next(error);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// };
 
 module.exports = {
   login,
