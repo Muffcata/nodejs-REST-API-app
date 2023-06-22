@@ -137,11 +137,13 @@ const subscription = async (req, res, next) => {
           },
         });
       } else {
-        res.status(404).json({
-          status: "error",
-          code: 404,
-          message: `User not found`,
-          data: "Not found",
+        res.status(200).json({
+          status: "success",
+          code: 200,
+          message: "OK",
+          data: {
+            avatarURL,
+          },
         });
       }
     } catch (error) {
@@ -151,10 +153,38 @@ const subscription = async (req, res, next) => {
   }
 };
 
+const avatar = async (res, req, next) => {
+  try {
+    const { email } = req.user;
+    const user = await service.updateAvatar(email, req.body);
+    if (user) {
+      res.status(200).json({
+        status: "success",
+        code: 200,
+        message: "OK",
+        data: {
+          user,
+        },
+      });
+    } else {
+      res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Not authorized",
+        data: "Not Found",
+      });
+    }
+  } catch (error) {
+    next(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   login,
   register,
   logout,
   currentUser,
   subscription,
+  avatar,
 };

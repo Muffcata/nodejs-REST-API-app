@@ -14,6 +14,8 @@ router.get("/users/logout", auth, ctrlUser.logout);
 
 router.patch("/users", auth, ctrlUser.subscription);
 
+router.patch("/users/avatars", ctrlUser.avatar);
+
 router.get("/contacts", ctrlContacts.getContact);
 
 router.get("/contacts/:contactId", ctrlContacts.getById);
