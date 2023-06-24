@@ -39,8 +39,7 @@ const updateStatusContact = (contactId, favorite) => {
 const updateSubscription = (email, subscription) =>
   User.findOneAndUpdate({ email }, { subscription }, { new: true });
 
-const updateAvatar = async (email, body) => {
-  const { avatarURL } = body;
+const updateAvatar = async (email, avatarURL) => {
   const user = await User.findOneAndUpdate(
     { email },
     { avatarURL },

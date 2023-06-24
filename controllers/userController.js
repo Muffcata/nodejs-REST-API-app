@@ -106,13 +106,13 @@ const logout = async (req, res, next) => {
 const currentUser = async (req, res, next) => {
   try {
     const user = req.user;
-    const { email, subscription } = user;
+
     res.json({
       status: "OK",
       code: 200,
       ResponseBody: {
         email: email,
-        subscription: subscription,
+        subscription: user.subscription,
       },
     });
   } catch (error) {
@@ -134,15 +134,6 @@ const subscription = async (req, res, next) => {
           data: {
             email,
             subscription,
-          },
-        });
-      } else {
-        res.status(200).json({
-          status: "success",
-          code: 200,
-          message: "OK",
-          data: {
-            avatarURL,
           },
         });
       }
