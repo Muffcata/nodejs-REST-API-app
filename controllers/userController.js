@@ -26,7 +26,7 @@ const validateSubscription = validator(subscriptionUpdate);
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
-  const avatarURL = gravatar.url(email, { s: "200", d: "retro" });
+  // const avatarURL = gravatar.url(email, { s: "200", d: "retro" });
 
   const user = await User.findOne({ email });
   if (user) {
@@ -42,8 +42,9 @@ const register = async (req, res, next) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
-    const newUser = new User({ email, avatarURL });
+    const newUser = new User({ email });
     newUser.setPassword(password);
+    newUser.avatarURL = gravatar.url(email, { s: "200", d: "retro" });
     await newUser.save();
 
     res.json({
@@ -105,14 +106,14 @@ const logout = async (req, res, next) => {
 
 const currentUser = async (req, res, next) => {
   try {
-    const user = req.user;
+    const { email } = req.user;
 
     res.json({
       status: "OK",
       code: 200,
       ResponseBody: {
         email: email,
-        subscription: user.subscription,
+        subscription: subscription,
       },
     });
   } catch (error) {
@@ -143,32 +144,13 @@ const subscription = async (req, res, next) => {
     }
   }
 };
-
-const avatar = async (res, req, next) => {
-  try {
-    const { email } = req.user;
-    const user = await service.updateAvatar(email, req.body);
-    if (user) {
-      res.status(200).json({
-        status: "success",
-        code: 200,
-        message: "OK",
-        data: {
-          user,
-        },
-      });
-    } else {
-      res.status(401).json({
-        status: "error",
-        code: 401,
-        message: "Not authorized",
-        data: "Not Found",
-      });
-    }
-  } catch (error) {
-    next(error);
-    return res.status(500).json({ message: "Server error" });
-  }
+const updateAvatar = async (email, avatarURL) => {
+  const user = await User.findOneAndUpdate(
+    { email },
+    { avatarURL },
+    { new: true }
+  );
+  return user;
 };
 
 module.exports = {
@@ -177,5 +159,5 @@ module.exports = {
   logout,
   currentUser,
   subscription,
-  avatar,
+  updateAvatar,
 };

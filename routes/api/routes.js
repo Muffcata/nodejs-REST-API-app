@@ -18,8 +18,6 @@ router.get("/users/logout", auth, ctrlUser.logout);
 
 router.patch("/users", auth, ctrlUser.subscription);
 
-// router.patch("/users/avatars", ctrlUser.avatar);
-
 router.get("/contacts", ctrlContacts.getContact);
 
 router.get("/contacts/:contactId", ctrlContacts.getById);
@@ -48,16 +46,18 @@ const upload = multer({ storage });
 
 router.patch(
   "/users/avatars",
+  auth,
   upload.single("avatar"),
   async (req, res, next) => {
     try {
       const { email } = req.user;
       const { path: tempName, originalname } = req.file;
       const fileName = path.join(storeAvatar, originalname);
-
       await fs.rename(tempName, fileName);
+
       const img = await Jimp.read(fileName);
       await img.autocrop().cover(250, 250).quality(60).writeAsync(fileName);
+
       await fs.rename(
         fileName,
         path.join(process.cwd(), "public/avatars", originalname)
@@ -68,16 +68,12 @@ router.patch(
         originalname
       );
       const cleanAvatarURL = avatarURL.replace(/\\/g, "/");
-      const user = await ctrlUser.avatar(email, cleanAvatarURL);
+      const user = await ctrlUser.updateAvatar(email, cleanAvatarURL);
 
-      res.json({
-        status: 200,
-        data: user,
-        message: "File uploaded",
-      });
+      res.status(200).json(user);
     } catch (error) {
       next(error);
-      return res.status(400).json({ message: "Missing required field email" });
+      return res.status(500).json({ message: "Server error" });
     }
   }
 );
