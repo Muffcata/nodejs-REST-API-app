@@ -2,6 +2,7 @@ const Joi = require("joi").extend(require("joi-phone-number"));
 const User = require("../service/models/users");
 const jwt = require("jsonwebtoken");
 const service = require("../service/index");
+const gravatar = require("gravatar");
 
 require("dotenv").config();
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
@@ -25,7 +26,7 @@ const validateSubscription = validator(subscriptionUpdate);
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email, password);
+  // const avatarURL = gravatar.url(email, { s: "200", d: "retro" });
 
   const user = await User.findOne({ email });
   if (user) {
@@ -43,6 +44,7 @@ const register = async (req, res, next) => {
     }
     const newUser = new User({ email });
     newUser.setPassword(password);
+    newUser.avatarURL = gravatar.url(email, { s: "200", d: "retro" });
     await newUser.save();
 
     res.json({
@@ -104,8 +106,8 @@ const logout = async (req, res, next) => {
 
 const currentUser = async (req, res, next) => {
   try {
-    const user = req.user;
-    const { email, subscription } = user;
+    const { email } = req.user;
+
     res.json({
       status: "OK",
       code: 200,
@@ -135,13 +137,6 @@ const subscription = async (req, res, next) => {
             subscription,
           },
         });
-      } else {
-        res.status(404).json({
-          status: "error",
-          code: 404,
-          message: `User not found`,
-          data: "Not found",
-        });
       }
     } catch (error) {
       console.log(error);
@@ -149,17 +144,14 @@ const subscription = async (req, res, next) => {
     }
   }
 };
-
-//       return res.status(400).json({ message: error.message });
-//     }
-//     const { email } = req.user;
-//     const user =;
-//     res.status(200).json(user);
-//   } catch (error) {
-//     next(error);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// };
+const updateAvatar = async (email, avatarURL) => {
+  const user = await User.findOneAndUpdate(
+    { email },
+    { avatarURL },
+    { new: true }
+  );
+  return user;
+};
 
 module.exports = {
   login,
@@ -167,4 +159,5 @@ module.exports = {
   logout,
   currentUser,
   subscription,
+  updateAvatar,
 };

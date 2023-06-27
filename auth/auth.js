@@ -1,7 +1,4 @@
-// const jwt = require("jsonwebtoken");
 const passport = require("passport");
-// require("dotenv").config();
-// const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 const auth = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user) => {
