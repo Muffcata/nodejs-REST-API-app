@@ -35,6 +35,9 @@ const updateStatusContact = (contactId, favorite) => {
     { new: true }
   );
 };
+const getUser = (email) => {
+  return User.findOne({ email });
+};
 
 const updateSubscription = (email, subscription) =>
   User.findOneAndUpdate({ email }, { subscription }, { new: true });
@@ -52,5 +55,6 @@ module.exports = {
   updateContact,
   updateStatusContact,
   updateSubscription,
+  getUser,
   verifyUser,
 };

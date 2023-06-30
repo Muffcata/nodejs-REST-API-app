@@ -170,6 +170,23 @@ const verifyToken = async (req, res, next) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+const sendMailAgain = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await service.getUser(email);
+    if (!user.isVerified) {
+      sendMail(email, user.verificationToken);
+      res.status(200).json({ message: "Verification email sent" });
+    } else {
+      res.status(400).json({ message: "Verification has already been passed" });
+    }
+  } catch (error) {
+    next(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -178,4 +195,5 @@ module.exports = {
   subscription,
   updateAvatar,
   verifyToken,
+  sendMailAgain,
 };
