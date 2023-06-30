@@ -3,6 +3,8 @@ const User = require("../service/models/users");
 const jwt = require("jsonwebtoken");
 const service = require("../service/index");
 const gravatar = require("gravatar");
+const { nanoid } = require("nanoid");
+const { sendMail } = require("../auth/sendgrid");
 
 require("dotenv").config();
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
@@ -26,8 +28,7 @@ const validateSubscription = validator(subscriptionUpdate);
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
-  // const avatarURL = gravatar.url(email, { s: "200", d: "retro" });
-
+  const verificationToken = nanoid();
   const user = await User.findOne({ email });
   if (user) {
     res.json({
@@ -42,10 +43,11 @@ const register = async (req, res, next) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
-    const newUser = new User({ email });
+    const newUser = new User({ email, verificationToken });
     newUser.setPassword(password);
     newUser.avatarURL = gravatar.url(email, { s: "200", d: "retro" });
     await newUser.save();
+    sendMail(email, verificationToken);
 
     res.json({
       status: "success",
@@ -153,6 +155,21 @@ const updateAvatar = async (email, avatarURL) => {
   return user;
 };
 
+const verifyToken = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+
+    const user = await service.verifyUser(verificationToken);
+    if (user) {
+      return res.status(200).json({ message: "Verification successful" });
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    next(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 module.exports = {
   login,
   register,
@@ -160,4 +177,5 @@ module.exports = {
   currentUser,
   subscription,
   updateAvatar,
+  verifyToken,
 };

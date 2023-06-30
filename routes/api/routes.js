@@ -8,6 +8,9 @@ const path = require("path");
 const fs = require("fs").promises;
 const Jimp = require("jimp");
 
+// router.post("/users/verify", ctrlUser.resendVerificationMail);
+router.get("/verify/:verificationToken", ctrlUser.verifyToken);
+
 router.post("/users/register", ctrlUser.register);
 
 router.post("/users/signin", ctrlUser.login);
