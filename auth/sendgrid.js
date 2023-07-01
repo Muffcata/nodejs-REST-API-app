@@ -15,11 +15,12 @@ const msg = (email, verificationToken) => {
     </div>`,
   };
 };
+
 const sendMail = (email, verificationToken) => {
   sgMail
     .send(msg(email, verificationToken))
-    .then(() => {
-      console.log("Email sent");
+    .then((info) => {
+      console.log(info);
     })
     .catch((error) => {
       console.error(error);

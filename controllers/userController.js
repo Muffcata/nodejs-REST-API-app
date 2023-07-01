@@ -156,9 +156,8 @@ const updateAvatar = async (email, avatarURL) => {
 };
 
 const verifyToken = async (req, res, next) => {
+  const { verificationToken } = req.params;
   try {
-    const { verificationToken } = req.params;
-
     const user = await service.verifyUser(verificationToken);
     if (user) {
       return res.status(200).json({ message: "Verification successful" });
@@ -187,6 +186,23 @@ const sendMailAgain = async (req, res, next) => {
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    const results = await service.getAllUsers();
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "OK",
+      data: {
+        users: results,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -196,4 +212,5 @@ module.exports = {
   updateAvatar,
   verifyToken,
   sendMailAgain,
+  getUsers,
 };

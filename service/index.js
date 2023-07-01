@@ -39,6 +39,10 @@ const getUser = (email) => {
   return User.findOne({ email });
 };
 
+const getAllUsers = () => {
+  return User.find();
+};
+
 const updateSubscription = (email, subscription) =>
   User.findOneAndUpdate({ email }, { subscription }, { new: true });
 
@@ -57,4 +61,5 @@ module.exports = {
   updateSubscription,
   getUser,
   verifyUser,
+  getAllUsers,
 };
