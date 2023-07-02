@@ -29,7 +29,7 @@ const validateSubscription = validator(subscriptionUpdate);
 const register = async (req, res, next) => {
   const { email, password } = req.body;
   const verificationToken = nanoid();
-  const user = await User.findOne({ email });
+  const user = await service.getUser(email);
   if (user) {
     res.json({
       status: "error",
@@ -69,21 +69,22 @@ const login = async (req, res, next) => {
   if (error) {
     return res.status(400).json({ message: error.message });
   }
-  const user = await User.findOne({ email });
+  const user = await service.getUser(email);
   if (!user || !user.validPassword(password)) {
     return res.json({
       status: "error",
-      code: 400,
+      code: 401,
       data: "Bad request",
       message: "Incorrect login/password",
     });
   }
   const payload = {
     id: user.id,
+    email: user.email,
   };
   const token = jwt.sign(payload, jwtSecretKey, { expiresIn: "1h" });
   user.token = token;
-  await user.save();
+  await User.findByIdAndUpdate(user.id, { token });
 
   res.json({
     status: "success",
@@ -160,13 +161,13 @@ const verifyToken = async (req, res, next) => {
   try {
     const user = await service.verifyUser(verificationToken);
     if (user) {
-      return res.status(200).json({ message: "Verification successful" });
+      res.status(200).json({ message: "Verification successful" });
     } else {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
     next(error);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 

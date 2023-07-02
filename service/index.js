@@ -49,7 +49,7 @@ const updateSubscription = (email, subscription) =>
 const verifyUser = (verificationToken) =>
   User.findOneAndUpdate(
     { verificationToken },
-    { isVerified: true, verificationToken: null }
+    { verify: true, verificationToken: null }
   );
 module.exports = {
   listContacts,
