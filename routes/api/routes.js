@@ -12,7 +12,7 @@ router.get("/users", ctrlUser.getUsers);
 
 router.post("/users/verify", ctrlUser.sendMailAgain);
 
-router.get("/verify/:verificationToken", ctrlUser.verifyToken);
+router.get("/users/verify/:verificationToken", ctrlUser.verifyToken);
 
 router.post("/users/register", ctrlUser.register);
 
