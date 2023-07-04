@@ -77,6 +77,11 @@ const login = async (req, res, next) => {
       data: "Bad request",
       message: "Incorrect login/password",
     });
+  } else if (!user.verify) {
+    return res.status(401).json({
+      message: "Firstly, click on the link to verify your account",
+      data: "Unauthorized",
+    });
   }
   const payload = {
     id: user.id,
